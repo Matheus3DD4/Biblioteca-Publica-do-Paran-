@@ -1,13 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  Modal,
-  TextInput,
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Modal, TextInput,
 } from "react-native";
 
 const Acervo = () => {
