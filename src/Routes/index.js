@@ -7,7 +7,7 @@ import Home from "../Pages/Home";
 import News from "../Pages/News";
 import Search from "../Pages/Search";
 import Header from "../components/Header";
-import Acervo from "../Pages/Collection";
+import Acervo from "../Pages/Collection/Acervo";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
