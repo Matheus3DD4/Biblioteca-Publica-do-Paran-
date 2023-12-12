@@ -1,62 +1,35 @@
-import React, { useState } from "react";
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Modal, TextInput,
+import { useEffect, useState, useCallback } from 'react';
+import { FAB } from 'react-native-paper';
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity,
 } from "react-native";
+import TituloService from '../../services/titulos';
 
 const Acervo = () => {
-  const [books, setBooks] = useState([
-    {
-      id: 1,
-      titulo: "Livro 1",
-      autor: "Autor 1",
-      coverImage: "https://via.placeholder.com/150",
-      sinopse:
-        "Sinopse do Livro 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam tristique tristique leo. ",
-      available: true,
-      details: {
-        idioma: "Português",
-        paginas: 300,
-        categoria: "Ficção",
-        ano: 2022,
-      },
-    },
-    {
-      id: 2,
-      titulo: "Livro 2",
-      autor: "Autor 2",
-      coverImage: "https://via.placeholder.com/150",
-      sinopse:
-        "Sinopse do Livro 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam tristique tristique leo. ",
-      available: false,
-      details: {
-        idioma: "Inglês",
-        paginas: 250,
-        categoria: "Não Ficção",
-        ano: 2021,
-      },
-    },
-    {
-      id: 3,
-      titulo: "Livro 3",
-      autor: "Autor 3",
-      coverImage: "https://via.placeholder.com/150",
-      sinopse:
-        "Sinopse do Livro 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam tristique tristique leo. ",
-      available: true,
-      details: {
-        idioma: "Espanhol",
-        paginas: 200,
-        categoria: "Romance",
-        ano: 2020,
-      },
-    },
-  ]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [titulos, setTitulos] = useState([]);
+
+
+  const fetchTitulos = async () => {
+    const data = await TituloService.getAllTitulos();
+    setTitulos(data);
+  };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchTitulos();
+    setRefreshing(false);
+  }, []);
+
+  useEffect(() => {
+    fetchTitulos();
+  }, []);
 
   const [selectedBook, setSelectedBook] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [borrowerName, setBorrowerName] = useState("");
 
-  const toggleModal = (book) => {
-    setSelectedBook(book);
+  const toggleModal = (titulo) => {
+    setSelectedBook(titulo.id);
     setBorrowerName("");
     setModalVisible(!isModalVisible);
   };
@@ -68,81 +41,31 @@ const Acervo = () => {
 
   return (
     <View style={styles.container}>
+      <FAB
+          icon="plus"
+          style={styles.fab}
+          onPress={() => navigation.navigate('AddTitulo')}
+        />
       <Text style={styles.header}>Acervo da Biblioteca</Text>
       <ScrollView style={styles.booksContainer}>
-        {books.map((book) => (
-          <TouchableOpacity key={book.id} onPress={() => toggleModal(book)}>
+        {titulos.map((titulo) => (
+          <TouchableOpacity key={titulo.id} onPress={() => toggleModal(titulo)}>
             <View style={styles.bookContainer}>
               <Image
-                source={{ uri: book.coverImage }}
+                source={{ uri: titulo.capa.file }}
                 style={styles.bookImage}
               />
               <View style={styles.bookInfo}>
-                <Text style={styles.bookTitulo}>{book.titulo}</Text>
-                <Text style={styles.bookAuthor}>Autor: {book.autor}</Text>
+                <Text style={styles.bookTitulo}>{titulo.titulo}</Text>
+                <Text style={styles.bookAuthor}>Autor: {titulo.autor.nome}</Text>
+                <Text style={styles.bookAuthor}>Categoria: {titulo.categoria.descricao}</Text>
               </View>
-              <Text
-                style={book.available ? styles.available : styles.notAvailable}
-              >
-                {book.available ? "Disponível" : "Indisponível"}
-              </Text>
+              <input type='radio'></input>
             </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={() => toggleModal()}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitulo}>Detalhes do Livro</Text>
-            <Image
-              source={{ uri: selectedBook?.coverImage }}
-              style={styles.modalImage}
-            />
-            <Text style={styles.modalBookTitulo}>{selectedBook?.titulo}</Text>
-            <Text style={styles.modalBookAuthor}>
-              Autor: {selectedBook?.autor}
-            </Text>
-            <Text style={styles.modalSynopsis}>{selectedBook?.sinopse}</Text>
-            <View style={styles.detailsContainer}>
-              <Text style={styles.detailText}>
-                Idioma: {selectedBook?.details.idioma}
-              </Text>
-              <Text style={styles.detailText}>
-                Páginas: {selectedBook?.details.paginas}
-              </Text>
-              <Text style={styles.detailText}>
-                Categoria: {selectedBook?.details.categoria}
-              </Text>
-              <Text style={styles.detailText}>
-                Ano de Publicação: {selectedBook?.details.ano}
-              </Text>
-            </View>
-            <TextInput
-              style={styles.input}
-              placeholder="Seu nome"
-              value={borrowerName}
-              onChangeText={(text) => setBorrowerName(text)}
-            />
-            <TouchableOpacity
-              style={styles.borrowButton}
-              onPress={handleBorrow}
-            >
-              <Text style={styles.borrowButtonText}>Emprestar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => toggleModal()}
-            >
-              <Text style={styles.closeButtonText}>Voltar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+
     </View>
   );
 };

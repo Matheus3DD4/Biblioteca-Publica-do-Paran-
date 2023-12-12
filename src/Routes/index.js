@@ -8,6 +8,8 @@ import News from "../Pages/News";
 import Search from "../Pages/Search";
 import Header from "../components/Header";
 import Acervo from "../Pages/Collection/Acervo";
+import Teste from "../Pages/teste";
+import AddTitulo from "../Pages/AddTitulo";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -28,6 +30,11 @@ function HomeTabs() {
       <Tab.Screen
         name="Acervo"
         component={Acervo}
+        options={{ headerShown: false }}
+      />
+      <Tab.Screen
+        name="Adicionar"
+        component={Teste}
         options={{ headerShown: false }}
       />
     </Tab.Navigator>
